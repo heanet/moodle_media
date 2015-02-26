@@ -18,7 +18,7 @@
 /**
  * Heanet Media repository upload
  *
- * @package    repository_heanetmedia_list
+ * @package    repository_heanetmedia_upload
  * @copyright  2015 Heanet swdev@heanet.ie
  * @author     Luis Naia
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later

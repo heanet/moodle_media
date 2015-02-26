@@ -18,7 +18,7 @@
 /**
  * Heanet Media repository upload
  *
- * @package    repository_heanetmedia_list
+ * @package    repository_heanetmedia_upload
  * @copyright  2015 Heanet swdev@heanet.ie
  * @author     Luis Naia
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -28,4 +28,4 @@ defined('MOODLE_INTERNAL') || die();
 
 $plugin->version = 2015022600; // The current plugin version (Date: YYYYMMDDXX)
 $plugin->requires = 2014110400; // Requires this Moodle version
-$plugin->component = 'repository_heanetmedia_list'; // Full name of the plugin (used for diagnostics)
+$plugin->component = 'repository_heanetmedia_upload'; // Full name of the plugin (used for diagnostics)
