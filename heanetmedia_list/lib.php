@@ -80,11 +80,19 @@ class repository_heanetmedia_list extends repository {
     }
 
     private function _get_collection() {
-        $list = array();
-        $this->feed_url = 'http://localhost:3000/search';
-        $c = new curl();
-        $content = $c->get($this->feed_url);
-        return json_decode($content);
+        $curl = new curl();
+        $content = $curl->get('http://localhost:3000/search');
+        $items = json_decode($content, true);
+
+        array_walk($items, function(&$item, $key) {
+          if (empty($item['title'])) {
+            $item['title'] = 'n/a';
+          }
+          // This is a hack so that moodles file picker accepts this file by
+          // extension
+          $item['title'] = $item['title'] . '.avi';
+        });
+        return $items;
     }
 
     public function global_search() {
