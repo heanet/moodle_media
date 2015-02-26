@@ -18,7 +18,12 @@ Plugin configurations
 * Define the API keys for remote listing
    Home / ► Site administration / ► Plugins / ► Repositories / ► Heanet Media: List
 
+Development information
+====================
+For code quality tools and Moodle guideline the moodlecheck plugin was used.
+More information on the plugin git  https://github.com/marinaglancy/moodle-local_moodlecheck
 
+The code is compatible with Php versions 5.3 and above.
 
 License information
 ====================
