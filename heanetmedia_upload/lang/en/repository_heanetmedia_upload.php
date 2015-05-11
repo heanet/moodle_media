@@ -27,4 +27,5 @@
 $string['pluginname'] = 'Heanet Media: Upload';
 $string['configplugin'] = 'Heanet Media - GUID and API keys';
 $string['userguiderror'] = 'You can find it under https://media.heanet.ie/secure/account';
+$string['missing_guid'] = 'Website guid is empty. This plugin was not propperly installed. You *should* re-enable this plugin';
 $string['listbtn'] = 'List';

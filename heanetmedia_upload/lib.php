@@ -28,40 +28,55 @@ require_once $CFG->dirroot . '/repository/lib.php';
 
 class repository_heanetmedia_upload extends repository {
 
-	public function __construct(
-		$repositoryid,
-		$context = SYSCONTEXTID,
-		$options = array()
-	) {
-		parent::__construct($repositoryid, $context, $options);
-	}
+  protected $upload_url;
 
-	public function get_listing($path = '', $page = '') {
+  public function __construct(
+    $repositoryid,
+    $context = SYSCONTEXTID,
+    $options = array()
+  ) {
+    parent::__construct($repositoryid, $context, $options);
+    $this->upload_url = "https://media.heanet.ie/secure/upload";
+  }
 
-		$list = array();
-		$list['object'] = array();
-		$list['object']['type'] = 'text/html';
-		$list['object']['src'] = "https://media.heanet.ie/secure/upload/";
-		$list['nologin'] = true;
-		$list['nosearch'] = true;
-		$list['norefresh'] = true;
+  public function wrap_url($url) {
+        global $USER;
 
-		return $list;
-	}
+        $website_guid = get_config('heanetmedia', 'moodle_uniqid');
+        if (empty($website_guid)) {
+            $message = __CLASS__ . ' says: '
+            . get_string('missing_guid', 'repository_heanetmedia_upload');
+            error_log($message);
+        }
 
-	public function print_login() {
-		return $this->get_listing();
-	}
+        $user_id_hash = md5($USER->id . $website_guid);
+        return $url . "?UserGUID=$user_id_hash";
+    }
 
-	public function supported_filetypes() {
-		return array('video');
-	}
+  public function get_listing($path = '', $page = '') {
+    $list = array();
+    $list['object'] = array();
+    $list['object']['type'] = 'text/html';
+    $list['object']['src'] = $this->wrap_url($this->upload_url);
+    $list['nologin'] = true;
+    $list['nosearch'] = true;
+    $list['norefresh'] = true;
+    return $list;
+  }
 
-	public function supported_returntypes() {
-		return FILE_EXTERNAL;
-	}
+  public function print_login() {
+    return $this->get_listing();
+  }
 
-	public function contains_private_data() {
-		return false;
-	}
+  public function supported_filetypes() {
+    return array('video');
+  }
+
+  public function supported_returntypes() {
+    return FILE_EXTERNAL;
+  }
+
+  public function contains_private_data() {
+    return false;
+  }
 }

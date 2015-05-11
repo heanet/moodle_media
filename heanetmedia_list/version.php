@@ -26,6 +26,6 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version = 2015022600; // The current plugin version (Date: YYYYMMDDXX)
+$plugin->version = 2015022601; // The current plugin version (Date: YYYYMMDDXX)
 $plugin->requires = 2014110400; // Requires this Moodle version
 $plugin->component = 'repository_heanetmedia_list'; // Full name of the plugin (used for diagnostics)

@@ -28,47 +28,39 @@ require_once($CFG->dirroot . '/repository/lib.php');
 
 class repository_heanetmedia_list extends repository {
 
+    protected $list_url;
+    protected $bind_url;
+    protected $check_login_url;
+
     public function __construct(
         $repositoryid,
         $context = SYSCONTEXTID,
         $options = array()
     ) {
         parent::__construct($repositoryid, $context, $options);
+
+        $this->list_url = "https://media.heanet.ie/api/1.0/media_list.php?";
+        $this->check_login_url = "https://media.heanet.ie/api/1.0/media_list.php?";
+        $this->bind_url = "https://media.heanet.ie/api/1.0/user_setguid.php?";
+    }
+
+    public static function plugin_init() {
+        set_config('moodle_uniqid', uniqid(), 'heanetmedia');
+        return true;
     }
 
     public static function get_type_option_names() {
         return array('user_guid', 'pluginname');
     }
 
-    public static function type_config_form(
-        $mform,
-        $classname = 'repository_heanetmedia_list'
-    ) {
-        $user_guid = get_config('heanetmedia', 'user_guid');
-
-        if (empty($user_guid)) {
-            $user_guid = '';
-        }
-
-        $mform->addElement('hidden', 'pluginname',
-            get_string('pluginname', 'repository_heanetmedia_list'),
-            array('value'=> "",'size' => '40'));
-
-        $mform->addElement('text', 'user_guid', 'Heanet Media GUID',
-            array('value'=>$user_guid,'size' => '40'));
-
-        $mform->addRule(
-            'user_guid',
-            get_string('userguiderror', 'repository_heanetmedia_list'),
-            'required',
-            null,
-            'client'
-        );
+    public static function type_config_form($mform,
+        $class = 'repository_heanetmedia_list') {
+        parent::type_config_form($mform);
     }
 
     public function get_listing($path = '', $page = '') {
         $ret  = array();
-        $ret['nologin'] = true;
+        $ret['nologin'] = false;
         $ret['page'] = (int)$page;
         if ($ret['page'] < 1) {
             $ret['page'] = 1;
@@ -80,19 +72,72 @@ class repository_heanetmedia_list extends repository {
     }
 
     private function _get_collection() {
-        $curl = new curl();
-        $content = $curl->get('http://localhost:3000/search');
-        $items = json_decode($content, true);
+        $response = $this->get_media_list();
+
+        if (empty($response['Data'])) {
+            error_log(' ' );
+            $message = __CLASS__ . ' says: '
+            . get_string('missing_data', 'repository_heanetmedia_list')
+            . json_encode($items);
+            error_log($message);
+            $response['Data'] = array();
+        }
+
+        $items = $response['Data'];
 
         array_walk($items, function(&$item, $key) {
           if (empty($item['title'])) {
             $item['title'] = 'n/a';
           }
-          // This is a hack so that moodles file picker accepts this file by
-          // extension
+
+          if (empty($item['thumbnail_width'])) {
+            $item['thumbnail_width'] = 128;
+          }
+
+            if (empty($item['thumbnail_height'])) {
+            $item['thumbnail_height'] = 128;
+          }
+
+          // This is a hack so that moodle file picker accepts this file
           $item['title'] = $item['title'] . '.avi';
         });
         return $items;
+    }
+
+    public function get_media_list () {
+        $curl = new curl();
+        $content = $curl->get($this->wrap_url($this->list_url));
+        return json_decode($content, true);
+    }
+
+    public function check_login() {
+        $curl = new curl();
+        $content = $curl->get($this->wrap_url($this->check_login_url));
+        $items = json_decode($content, true);
+        return isset($items['Status']) && $items['Status'] === 'Found';
+    }
+
+    public function wrap_url($url) {
+        global $USER;
+
+        $website_guid = get_config('heanetmedia', 'moodle_uniqid');
+        if (empty($website_guid)) {
+            $message = __CLASS__ . ' says: '
+            . get_string('missing_guid', 'repository_heanetmedia_list');
+            error_log($message);
+        }
+
+        $user_id_hash = md5($USER->id . $website_guid);
+        error_log("user id hash: $user_id_hash");
+        return $url . "UserGUID=$user_id_hash";
+    }
+
+    public function print_login($ajax = true) {
+        $ret = array();
+        $ret['object'] = array();
+        $ret['object']['type'] = 'text/html';
+        $ret['object']['src'] = $this->wrap_url($this->bind_url);
+        return $ret;
     }
 
     public function global_search() {
