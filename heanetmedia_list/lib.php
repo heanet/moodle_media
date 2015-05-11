@@ -75,7 +75,6 @@ class repository_heanetmedia_list extends repository {
         $response = $this->get_media_list();
 
         if (empty($response['Data'])) {
-            error_log(' ' );
             $message = __CLASS__ . ' says: '
             . get_string('missing_data', 'repository_heanetmedia_list')
             . json_encode($items);
