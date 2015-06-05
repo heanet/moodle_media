@@ -41,7 +41,7 @@ class repository_heanetmedia_list extends repository {
 
         $this->list_url = "https://media.heanet.ie/api/1.0/media_list.php?";
         $this->check_login_url = "https://media.heanet.ie/api/1.0/media_list.php?";
-        $this->bind_url = "https://media.heanet.ie/api/1.0/user_setguid.php?";
+        $this->bind_url = "https://media.heanet.ie/secure/account/user_setguid.php?";
     }
 
     public static function plugin_init() {
