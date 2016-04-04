@@ -129,7 +129,7 @@ class filter_heanetmedia extends moodle_text_filter
             .'allowFullScreen></iframe>';
         }
 
-        if ($result !== '') {
+        if (isset($result) && $result !== '') {
             return $result;
         } else {
             return $matches[0];
